@@ -3,6 +3,12 @@
 
 ----------
 
+## Notes
+
+We are currently collecting feedback to help improve this work. A major v2.0 release is planned in the next 2–3 months, and we would greatly appreciate your input in shaping its development and improvement.
+
+Please share your suggestions and comments through the following form: [Feedback Form](https://forms.gle/wQ8Ypw2x2kUb18XVA)
+
 ## Content
 
 - [Introduction](#introduction)
