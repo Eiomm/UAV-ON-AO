@@ -5,8 +5,10 @@ from PIL import Image
 import json
 import time
 from openai import AsyncOpenAI
+from openai import OpenAI
 from dashscope import MultiModalConversation
 import asyncio
+
 
 
 def encode_image(image_files):
@@ -25,19 +27,19 @@ def generate_caption(image_file, temperature=0.7):
 
             1. **Key objects and their core attributes**  
             - List every object with simple nouns **and** one or two attributes (e.g., “yellow slide, medium-sized, plastic”; “Springer Spaniel dog, tricolor coat”; “gas station building, metal canopy”).  
-            
+
             2. **Object quantities and groupings**  
             - Specify number if more than one or if it’s a cluster (e.g., “three children”, “a row of parked cars”).  
-            
+
             3. **Precise spatial relationships**  
             - Describe relative positions, distances or directions (e.g., “the dog sits immediately to the right of the slide”, “the building stands in the distant background, slightly left of center”).  
-            
+
             4. **Object states or actions**  
             - Note any visible activity or condition (e.g., “children sliding down”, “pump nozzles hanging idle”, “car doors open”).  
-                
+
             5. **Avoid opinions or irrelevancies**  
             - Use plain factual language. Do not include judgments, emotional tone words, or fine-grained internal part details.  
-        
+
             User will supply {n} images; you must return exactly one well-structured description string for every image(no quotation marks).
             For each image, return exactly only one description item. 
             You are not allowed to return a blank caption string or more than {n} caption for {n} images.
@@ -54,8 +56,8 @@ def generate_caption(image_file, temperature=0.7):
             - Do **not** include any extra explanation, commentary, markdown formatting, or newlines.
             - The response must be a **single-line JSON object**, not a stringified object or list.
     """
-    
-    
+
+
     captions = []
     user_content = []
     for img_b64 in image_file:
@@ -63,10 +65,10 @@ def generate_caption(image_file, temperature=0.7):
     messages = [{"role": "system",
                 "content": [system_prompt]},
                 {'role':'user','content': user_content}]
-    
+
     try:
         response = MultiModalConversation.call(
-            api_key="your_api_key_here",  # 替换为你的 qwen-api
+            api_key="sk-080736fa4a9a4dcca9f4b1bfee5d3fd1",  # 替换为你的 qwen-api
             model='qwen-vl-max',
             messages=messages
         )
@@ -93,4 +95,3 @@ def generate_caption(image_file, temperature=0.7):
         traceback.print_exc()
         # 返回默认描述（防止程序崩溃）
         return ["Description time out. [ServerError]"] * len(image_file)
-    
