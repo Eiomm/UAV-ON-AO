@@ -492,7 +492,8 @@ class EventHandler(object):
         
         p = subprocess.Popen(
                         subprocess_execute,
-                        stdin=None, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT,
+                        # stdin=None, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT,
+                        stdin=None, stdout=None, stderr=None,
                         shell=True,
                     )
         
@@ -593,7 +594,7 @@ if __name__ == '__main__':
     parser.add_argument(
         "--root_path",
         type=str,
-        default="/home/syx/Desktop/UAV/UAV_ON/ENVS",
+        default="/home/xxl/下载/WJA/TEST_ENVS", ##### 修改为你的环境路径
         help='root dir for env path'
     ) 
     args = parser.parse_args()

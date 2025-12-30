@@ -5,7 +5,7 @@ import numpy as np
 import copy
 
 from src.common.param import args
-from airsim_plugin.airsim_settings import AirsimActions, AirsimActionSettings
+from airsim_plugin.airsim_settings import AirsimActionSettings
 from utils.logger import logger
 
 

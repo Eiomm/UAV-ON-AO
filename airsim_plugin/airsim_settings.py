@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import Dict
 from common.param import args
 
@@ -12,15 +11,6 @@ class Singleton(type):
                 *args, **kwargs
             )
         return cls._instances[cls]
-
-
-# ====== 动作 ID（env_uav.py 需要的）======
-class AirsimActions(Enum):
-    MOVE_FORWARD = 0
-    TURN_LEFT = 1
-    TURN_RIGHT = 2
-    MOVE_UP = 3
-    MOVE_DOWN = 4
 
 
 # ====== 动作参数（步长 / 角度）======

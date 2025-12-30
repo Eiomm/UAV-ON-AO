@@ -15,7 +15,6 @@ from typing import Dict, List, Optional
 import tqdm
 from src.common.param import args
 from utils.logger import logger
-from airsim_plugin.airsim_settings import AirsimActions
 sys.path.append(str(Path(str(os.getcwd())).resolve()))
 from airsim_plugin.AirVLNSimulatorClientTool import AirVLNSimulatorClientTool
 from utils.env_utils_uav import SimState, getNextPosition

@@ -2,7 +2,7 @@ from model_wrapper.base_model import BaseModelWrapper
 from airsim_plugin.airsim_settings import AirsimActionSettings
 #from model_wrapper.Qwen_api_captions_2 import generate_caption, encode_image
 from model_wrapper.Qwen_api_captions import generate_caption, encode_image
-from openai import AsyncClient
+from openai import AsyncOpenAI
 from io import BytesIO
 from src.common.param import args
 from common.prompts import fixed_system_prompt, fixed_user_prompt_template, unfixed_system_prompt, unfixed_user_prompt_template
@@ -22,7 +22,10 @@ class ONAir(BaseModelWrapper):
     def __init__(self, fixed, batch_size):
         super().__init__()
         self.fixed = fixed
-        self.gpt_client = AsyncClient()
+        self.gpt_client = AsyncOpenAI(
+            api_key="sk-be8ced244f0448ec8f478dbacc875a61",  # 替换为你的 qwen-api
+            base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"
+        )
         self.start_position = [[] for _ in range(batch_size)]
         self.start_yaw = [0 for _ in range(batch_size)]
         self.current_poses = [[] for _ in range(batch_size)]
@@ -164,9 +167,10 @@ class ONAir(BaseModelWrapper):
     
     async def unfixed_single_call(self, conversation):
         resp = await self.gpt_client.chat.completions.create(
-            model='gpt-4.1-mini',
+            model='qwen-plus', ##'替换自己的模型'
             messages=conversation
         )
+
         text = resp.choices[0].message.content.strip()
         text = text.strip("[]`\"'")
         parts = [p.strip().strip("[]`\"'") for p in text.split(",")]
@@ -179,7 +183,7 @@ class ONAir(BaseModelWrapper):
     async def fixed_single_call(self, conversation):
         
         resp = await self.gpt_client.chat.completions.create(
-            model='gpt-4.1-mini',
+            model='qwen-plus',
             messages=conversation
         )
         action = resp.choices[0].message.content.strip().strip('\'"')

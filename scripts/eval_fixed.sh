@@ -5,7 +5,7 @@ echo $PWD
 CUDA_VISIBLE_DEVICES=0 python -u $root_dir/src/eval_2.py \
     --maxActions 150 \
     --eval_save_path $root_dir/logs/scene \
-    --dataset_path your/dataset/path \
+    --dataset_path /home/xxl/下载/WJA/DATASET/valset/Slum.json \
     --is_fixed  true\
     --gpu_id 0 \
     --batchSize 1 \
