@@ -441,8 +441,10 @@ class EventHandler(object):
                 p_s.append(None)
                 continue
             else:
-                subprocess_execute = "bash {}  -RenderOffscreen -NoSound -NoVSync -GraphicsAdapter={} --settings={}".format(
+                render_flag = "-RenderOffscreen" if int(getattr(args, "render_offscreen", 1)) == 1 else ""
+                subprocess_execute = "bash {} {} -NoSound -NoVSync -GraphicsAdapter={} --settings={}".format(
                     choose_env_exe_paths[index],
+                    render_flag,
                     gpu_id,
                     str(CWD_DIR / 'settings' / str(ports[index]) / 'settings.json'),
                 )
@@ -450,9 +452,12 @@ class EventHandler(object):
                 print(subprocess_execute)
 
                 try:
+                    show_window = int(getattr(args, "render_offscreen", 1)) == 0
                     p = subprocess.Popen(
                         subprocess_execute,
-                        stdin=None, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT,
+                        stdin=None,
+                        stdout=None if show_window else subprocess.DEVNULL,
+                        stderr=None if show_window else subprocess.STDOUT,
                         shell=True,
                     )
                     p_s.append(p)
@@ -482,11 +487,13 @@ class EventHandler(object):
         env_path = os.path.join(args.root_path, env_info['exec_path'], env_info['bash_name'] + '.sh')
     
 
-        subprocess_execute = "bash {} -RenderOffscreen -NoSound -NoVSync -GraphicsAdapter={} -settings={} ".format(
-                    env_path,
-                    gpu_id,
-                    str(CWD_DIR / 'settings' / str(port) / 'settings.json'),
-                )
+        render_flag = "-RenderOffscreen" if int(getattr(args, "render_offscreen", 1)) == 1 else ""
+        subprocess_execute = "bash {} {} -NoSound -NoVSync -GraphicsAdapter={} --settings={}".format(
+            env_path,
+            render_flag,
+            gpu_id,
+            str(CWD_DIR / 'settings' / str(port) / 'settings.json'),
+        )
         time.sleep(1)
         print(subprocess_execute)
         
@@ -597,6 +604,13 @@ if __name__ == '__main__':
         default="/home/xxl/下载/WJA/TEST_ENVS", ##### 修改为你的环境路径
         help='root dir for env path'
     ) 
+    parser.add_argument(
+        "--render_offscreen",
+        type=int,
+        default=1,
+        choices=[0, 1],
+        help='1: run UE4 in offscreen mode (no window); 0: show UE4 window'
+    )
     args = parser.parse_args()
 
 

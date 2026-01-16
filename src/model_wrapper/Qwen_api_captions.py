@@ -4,9 +4,15 @@ import traceback
 from PIL import Image
 import json
 import time
+import os
 from openai import AsyncOpenAI
 from openai import OpenAI
-from dashscope import MultiModalConversation
+try:
+    from dashscope import MultiModalConversation
+    DASHSCOPE_AVAILABLE = True
+except ImportError:
+    DASHSCOPE_AVAILABLE = False
+    print("[WARNING] dashscope not available, will use OpenAI-compatible API")
 import asyncio
 
 
@@ -58,7 +64,11 @@ def generate_caption(image_file, temperature=0.7):
     """
 
 
+
     captions = []
+    
+    print(f"\n📸 开始生成图像描述，数量: {n}")
+    
     user_content = []
     for img_b64 in image_file:
             user_content.append({'image': 'data:image/png;base64,' + img_b64})
@@ -67,6 +77,7 @@ def generate_caption(image_file, temperature=0.7):
                 {'role':'user','content': user_content}]
 
     try:
+        print(f"🌐 调用通义千问VL-Max API...")
         response = MultiModalConversation.call(
             api_key="sk-080736fa4a9a4dcca9f4b1bfee5d3fd1",  # 替换为你的 qwen-api
             model='qwen-vl-max',
@@ -82,6 +93,11 @@ def generate_caption(image_file, temperature=0.7):
 
         # 解析 JSON 格式
         captions = json.loads(raw)
+        
+        print(f"✅ 成功生成{len(captions)}个图像描述")
+        for i, cap in enumerate(captions[:2]):  # 只显示前2个
+            display_cap = cap[:80] + "..." if len(cap) > 80 else cap
+            print(f"  图像{i+1}: {display_cap}")
 
         if len(captions) != len(image_file):
             raise ValueError(

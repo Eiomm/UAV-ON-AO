@@ -22,9 +22,14 @@ class ONAir(BaseModelWrapper):
     def __init__(self, fixed, batch_size):
         super().__init__()
         self.fixed = fixed
+        # 支持硅基流动API和通义千问API，通过环境变量配置
+        api_key = os.getenv("SILICONFLOW_TEXT_API_KEY") or os.getenv("QWEN_API_KEY", "sk-be8ced244f0448ec8f478dbacc875a61")
+        base_url = os.getenv("SILICONFLOW_BASE_URL") or os.getenv("QWEN_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
+        self.model_name = os.getenv("SILICONFLOW_TEXT_MODEL", "qwen-plus")  # 默认qwen-plus，可设置为deepseek-ai/DeepSeek-V3
+        
         self.gpt_client = AsyncOpenAI(
-            api_key="sk-be8ced244f0448ec8f478dbacc875a61",  # 替换为你的 qwen-api
-            base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"
+            api_key=api_key,
+            base_url=base_url
         )
         self.start_position = [[] for _ in range(batch_size)]
         self.start_yaw = [0 for _ in range(batch_size)]
@@ -167,27 +172,31 @@ class ONAir(BaseModelWrapper):
     
     async def unfixed_single_call(self, conversation):
         resp = await self.gpt_client.chat.completions.create(
-            model='qwen-plus', ##'替换自己的模型'
+            model=self.model_name,  # 使用配置的模型名称
             messages=conversation
         )
 
         text = resp.choices[0].message.content.strip()
+        print(f"\n🤖 模型原始响应: {text}")
         text = text.strip("[]`\"'")
         parts = [p.strip().strip("[]`\"'") for p in text.split(",")]
         action = parts[0].strip('\'"')
+
         # 解析 value
         value = float(parts[1]) if "." in parts[1] else int(parts[1])
         done = (action == 'stop')
+        print(f"📍 解析结果: 动作={action}, 步长={value}, 终止={done}")
         return action, value, done 
     
     async def fixed_single_call(self, conversation):
         
         resp = await self.gpt_client.chat.completions.create(
-            model='qwen-plus',
+            model=self.model_name,  # 使用配置的模型名称
             messages=conversation
         )
-        action = resp.choices[0].message.content.strip().strip('\'"')
-        # 解析 value
+        raw_response = resp.choices[0].message.content.strip()
+        action = raw_response.strip('\'"')
+        print(f"\n🤖 模型响应: {raw_response} -> 动作: {action}")
         
         done = (action == 'stop')
         return action, 0, done              
@@ -270,7 +279,7 @@ class ONAir(BaseModelWrapper):
                     if fixed:
                         new_position = np.array([x, y, z]) + unit_vector * AirsimActionSettings.FORWARD_STEP_SIZE
                     else:
-                        new_position = np.array([x, y, z]) + unit_vector * step_size
+                        new_position = np.array([x, y, z]) + unit_vector * step_size[i]
 
                     if new_position[0] > x_max or new_position[0] < x_min or new_position[1] > y_max or new_position[1] < y_min:
                         new_actions[i] = 'rotl'
@@ -292,7 +301,7 @@ class ONAir(BaseModelWrapper):
                     if fixed:
                         new_position = np.array([x, y, z]) - unit_vector * AirsimActionSettings.LEFT_RIGHT_STEP_SIZE
                     else:
-                        new_position = np.array([x, y, z]) - unit_vector * step_size
+                        new_position = np.array([x, y, z]) - unit_vector * step_size[i]
                     
                     if new_position[0] > x_max or new_position[0] < x_min or new_position[1] > y_max or new_position[1] < y_min:
                         new_actions[i] = 'rotl'
@@ -313,7 +322,7 @@ class ONAir(BaseModelWrapper):
                     if fixed:
                         new_position = np.array([x, y, z]) + unit_vector * AirsimActionSettings.LEFT_RIGHT_STEP_SIZE
                     else:
-                        new_position = np.array([x, y, z]) + unit_vector * step_size
+                        new_position = np.array([x, y, z]) + unit_vector * step_size[i]
 
                     if new_position[0] > x_max or new_position[0] < x_min or new_position[1] > y_max or new_position[1] < y_min:
                         new_actions[i] = 'rotl'

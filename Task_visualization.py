@@ -15,8 +15,9 @@ from scipy.spatial.transform import Rotation as R
 # 统一路径前缀
 # base_path = "./Logs/unfixed_logs/BrushifyUrban/success_BrushifyUrban.json/task_26"
 
-base_path = "./Logs/eval_fixed/BrushifyUrban/BrushifyUrban.json/task_4"
-
+# base_path = "./Logs/eval_fixed/BrushifyUrban/BrushifyUrban.json/task_4"
+# 修改这一行指向你刚才运行的任务文件夹
+base_path = "/home/xxl/下载/WJA/UAV_ON/logs/scene/Slum.json/task_3"
 
 
 # base_path = "./logs/eval_fixed/CabinLake/success_CabinLake.json/task_50"
